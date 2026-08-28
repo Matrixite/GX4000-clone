@@ -35,9 +35,21 @@ Official GOWIN EDA download page:
 
 https://www.gowinsemi.com/en/support/download_eda/
 
+### Ready-to-open GOWIN project
+
+This repository now includes:
+
+```text
+GX4000_RealCart_RevA.gprj
+```
+
+Open that file directly in GOWIN EDA. It already targets the Tang Nano 20K FPGA and includes the Rev A diagnostic HDL sources.
+
+The real-cartridge pin constraints are intentionally **not** filled in yet. Those must match the exact pins used by the external 5 V level-shifter/cartridge adapter.
+
 ### Device selection
 
-When creating the project in GOWIN EDA, select the device fitted to the Tang Nano 20K:
+The GOWIN project targets:
 
 ```text
 GW2AR-LV18QN88C8/I7
@@ -51,13 +63,13 @@ GW2AR-18C
 
 ### Rev A diagnostic top module
 
-For the first real-cartridge hardware test, set the project top-level module to:
+For the first real-cartridge hardware test, use:
 
 ```text
 gx4000_realcart_diag_top
 ```
 
-Add these source files to the GOWIN project:
+The project includes these source files:
 
 ```text
 rtl/top/gx4000_realcart_diag_top.sv
@@ -90,10 +102,10 @@ Do **not** guess cartridge-interface FPGA pin numbers.
 ### Basic programming workflow
 
 1. Install GOWIN EDA and GOWIN Programmer.
-2. Create a project for `GW2AR-LV18QN88C8/I7`.
-3. Add the Rev A SystemVerilog files listed above.
-4. Set `gx4000_realcart_diag_top` as the top module.
-5. Add a completed `.cst` constraints file.
+2. Open `GX4000_RealCart_RevA.gprj`.
+3. Confirm the target is `GW2AR-LV18QN88C8/I7`.
+4. Add a completed `.cst` constraints file for the cartridge adapter wiring.
+5. Set `gx4000_realcart_diag_top` as the top module if GOWIN does not select it automatically.
 6. Run synthesis.
 7. Run place-and-route.
 8. Generate the bitstream.
