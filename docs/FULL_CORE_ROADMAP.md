@@ -1,58 +1,35 @@
 # Full playable GX4000 roadmap
 
-## Phase 1 — real cartridge electrical bring-up
-Included in Rev A.
+## Phase 1 — real cartridge electrical bring-up — implemented
+- 5 V-safe adapter design
+- address/page drive, ROM read, ACID observation, UART dump
 
-- 5 V-safe cartridge adapter
-- address/page drive
-- ROM read
-- ACID link observation
-- UART cartridge dump
+## Phase 2 — CPU + base CPC timing — implemented
+- 4 MHz TV80 Z80, 64 KiB RAM, CRTC/Gate Array, CPC modes 0/1/2
+- real-cartridge execution and integrated 720x576p50 HDMI/TMDS
 
-## Phase 2 — CPU + base CPC timing — IMPLEMENTED IN RTL, HARDWARE VALIDATION PENDING
-- [x] Z80-compatible CPU at 4 MHz (TV80 submodule)
-- [x] 64 KiB RAM
-- [x] deterministic CPU/video slot arbitration
-- [x] I/O decode
-- [x] Gate Array compatible mode/palette/interrupt registers
-- [x] programmable 6845-style CRTC timing
-- [x] CPC modes 0/1/2 pixel decoding
-- [x] real-cartridge ROM execution path with WAIT states
-- [ ] GOWIN synthesis/place-and-route validation
-- [ ] physical logic-analyser validation and contention tuning
-
-## Phase 3 — GX4000 ASIC
-- ASIC unlock state machine
-- ASIC register page at 0x4000-0x7FFF
-- 12-bit palette
-- 16 x 16 hardware sprites, 16 sprites
-- sprite zoom
+## Phase 3 — GX4000 / CPC Plus ASIC — implemented in RTL
+- ASIC unlock/relock and RMR2 register page
+- 32-entry 12-bit palette
+- 16 hardware sprites with x1/x2/x4 zoom
 - programmable raster interrupt
-- soft scroll
-- split screen
-- DMA channels and interrupts
-- DMA sound
+- screen split / secondary address
+- horizontal and vertical soft scroll
+- Plus interrupt vector/source handling
+- three-channel sound-DMA engine, status and interrupts
+- DMA PAUSE/REPEAT/LOOP/INT/STOP and PSG LOAD
 
-## Phase 4 — audio and controllers
+## Phase 4 — audio and controllers — next
 - AY-3-8912 compatible PSG
-- PPI behaviour needed by GX4000 software
-- digital joystick ports
-- optional analogue paddle support
+- Plus-compatible PPI behaviour
+- CPU + Phase-3 DMA PSG writes
+- stereo mixer to existing HDMI LPCM
+- joystick ports and optional analogue paddles
 
-## Phase 5 — Tang Nano 20K presentation layer
-- exact 16 MHz system timing domain
-- HDMI video scaler/output
-- HDMI or I2S audio
-- reset and cartridge-presence handling
-- optional UART debugger
+## Phase 5 — presentation/system integration
+- refine scaler for non-standard CRTC timings
+- reset/cartridge-presence handling
+- optional UART trace
 
 ## Phase 6 — compatibility validation
-Test real cartridges with logic-analyser captures.
-
-Priority examples:
-- Burnin' Rubber
-- Batman the Movie
-- Pang
-- Switchblade
-- Navy Seals
-- Robocop 2
+Real-cartridge and logic-analyser tuning. Priority examples: Burnin' Rubber, Batman the Movie, Pang, Switchblade, Navy Seals, Robocop 2.

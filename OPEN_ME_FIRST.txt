@@ -1,23 +1,13 @@
 GX4000 Tang Nano 20K project
 
-MAIN INTEGRATED BUILD:
-  GX4000_Phase2_HDMI.gprj
-  Real cartridge -> Phase 2 Z80/CPC core -> 720x576p50 HDMI/TMDS
-  HDMI audio packets are enabled; audio is silent until Phase 4.
-  Clone/update git submodules first for TV80.
+MAIN PHASE 3 BUILD:
+  GX4000_Phase3_HDMI.gprj
+  Real cartridge -> Z80/CPC core -> Plus ASIC -> 720x576p50 HDMI/TMDS
 
-For Phase 2 raw CPC base core:
-  GX4000_Phase2_BaseCPC.gprj
+Phase 3 adds ASIC unlock/RMR2, 4096-colour palette, 16 hardware sprites + zoom, PRI, split/soft-scroll and 3-channel DMA.
+DMA PSG writes are generated; audible AY audio is Phase 4.
 
-For real-cartridge diagnostic bring-up:
-  GX4000_RealCart_RevA.gprj
+Initialize TV80 if needed:
+  git submodule update --init --recursive
 
-For standalone HDMI video + 48 kHz stereo audio bring-up:
-  GX4000_HDMI_Bringup.gprj
-  Expected output: 720x576p50 colour bars + 1 kHz stereo tone
-
-Read:
-  README.md
-  docs/PHASE2_BASE_CPC.md
-  docs/PHASE2_HDMI_INTEGRATION.md
-  docs/HDMI_AUDIO_TMDS.md
+Read README.md and docs/PHASE3_PLUS_ASIC.md.
