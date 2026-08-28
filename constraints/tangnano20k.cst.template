@@ -1,0 +1,24 @@
+# Tang Nano 20K constraint TEMPLATE
+#
+# Do not fabricate or connect a cartridge adapter using guessed FPGA pin numbers.
+# Fill these LOC values from the exact Tang Nano 20K header pins used by your adapter.
+#
+# Example form:
+# IO_LOC "clk" <PIN>;
+# IO_PORT "clk" IO_TYPE=LVCMOS33;
+#
+# Signals to assign:
+# clk
+# reset_n
+# cart_a[0] ... cart_a[13]
+# cart_ca[0] ... cart_ca[4]
+# cart_ce_n
+# cart_d[0] ... cart_d[7]
+# cart_clk4
+# cart_cclr
+# cart_sin
+# uart_tx_o
+# led_done
+#
+# All FPGA I/O here must remain at 3.3 V.
+# The 5 V conversion belongs on the external cartridge adapter.
