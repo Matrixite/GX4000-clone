@@ -1,0 +1,14 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
+    <FileList>
+        <File path="rtl/top/gx4000_realcart_diag_top.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/cart/cart_read_cycle.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/cart/acid_link_monitor.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/diag/cart_diag_engine.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/common/uart_tx.sv" type="file.verilog" enable="1"/>
+    </FileList>
+</Project>
