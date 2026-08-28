@@ -14,3 +14,7 @@ Read:
   README.md
   README_HDMI_AUDIO.md
   docs/HDMI_AUDIO_TMDS.md
+
+For Phase 2 executable CPC base core:
+  GX4000_Phase2_BaseCPC.gprj
+  (clone/update git submodules first)

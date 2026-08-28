@@ -9,14 +9,17 @@ Included in Rev A.
 - ACID link observation
 - UART cartridge dump
 
-## Phase 2 — CPU + base CPC timing
-- Z80-compatible CPU at 4 MHz
-- 64 KiB RAM
-- memory arbitration
-- I/O decode
-- Gate Array compatible mode/palette registers
-- CRTC timing
-- CPC modes 0/1/2
+## Phase 2 — CPU + base CPC timing — IMPLEMENTED IN RTL, HARDWARE VALIDATION PENDING
+- [x] Z80-compatible CPU at 4 MHz (TV80 submodule)
+- [x] 64 KiB RAM
+- [x] deterministic CPU/video slot arbitration
+- [x] I/O decode
+- [x] Gate Array compatible mode/palette/interrupt registers
+- [x] programmable 6845-style CRTC timing
+- [x] CPC modes 0/1/2 pixel decoding
+- [x] real-cartridge ROM execution path with WAIT states
+- [ ] GOWIN synthesis/place-and-route validation
+- [ ] physical logic-analyser validation and contention tuning
 
 ## Phase 3 — GX4000 ASIC
 - ASIC unlock state machine

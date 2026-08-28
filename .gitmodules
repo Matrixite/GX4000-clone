@@ -1,0 +1,3 @@
+[submodule "third_party/Z80-FPGA"]
+    path = third_party/Z80-FPGA
+    url = https://github.com/Obijuan/Z80-FPGA.git

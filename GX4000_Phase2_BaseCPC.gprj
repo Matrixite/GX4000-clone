@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
+    <FileList>
+        <File path="rtl/top/gx4000_phase2_top.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/gowin_pll_32m.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_clock_tree.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_ram64k.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_crtc6845.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_gate_array.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_video.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_cart_cpu_bridge.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/cart/gx4000_cart_mapper.sv" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80s.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_core.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_alu.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_mcode.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_reg.v" type="file.verilog" enable="1"/>
+        <File path="constraints/tangnano20k_phase2.cst" type="file.cst" enable="1"/>
+        <File path="constraints/tangnano20k_phase2.sdc" type="file.sdc" enable="1"/>
+    </FileList>
+</Project>

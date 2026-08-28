@@ -1,70 +1,29 @@
 # GX4000 FPGA Real-Cartridge Clone — Rev A
 
-This is a **hardware bring-up revision** for building an Amstrad GX4000-compatible FPGA console around a Tang Nano 20K while using **real CPC Plus / GX4000 cartridges**.
+This project builds an Amstrad GX4000-compatible FPGA console around a Tang Nano 20K and real CPC Plus / GX4000 cartridges.
 
-Rev A deliberately starts with the cartridge interface because the physical cartridge bus is 5 V and must be proved safe before a full GX4000 core is connected to it.
+## Projects
 
-## What this revision does
+- `GX4000_RealCart_RevA.gprj` — real-cartridge diagnostic bring-up
+- `GX4000_HDMI_Bringup.gprj` — 720x576p50 HDMI + 48 kHz stereo LPCM bring-up
+- `GX4000_Phase2_BaseCPC.gprj` — Phase 2 executable CPC base core
 
-- Defines the real 36-contact (2x18) GX4000/CPC Plus cartridge bus.
-- Drives A0-A13 and CA14-CA18.
-- Drives cartridge `/CE`.
-- Provides `CLK4` and `CCLR` outputs and samples `SIN` for ACID diagnostics.
-- Reads the cartridge D0-D7 bus.
-- Includes a synthesizable real-cartridge diagnostic reader.
-- Dumps cartridge bytes over UART at 115200 baud.
-- Includes the GX4000 cartridge page-translation logic described by the Arnold V specification.
-- Includes an ASIC/core integration shell for the later playable core.
-- Includes a testbench for cartridge bank translation.
+## Phase 2 — executable CPC base core
 
-## Software needed to program the FPGA
+Phase 2 adds a 4 MHz TV80 Z80, 64 KiB RAM, deterministic CPU/video timing, CPC Gate Array palette/mode/interrupt logic, a programmable 6845-style CRTC, CPC Modes 0/1/2 video decoding, and real-cartridge ROM execution with Z80 WAIT states.
 
-For the **Tang Nano 20K** build, use **GOWIN EDA**.
+The CPU is pinned as the `third_party/Z80-FPGA` git submodule. Clone with `--recurse-submodules`, or run `git submodule update --init --recursive` in an existing clone. TV80 carries a permissive MIT-style source license.
 
-GOWIN EDA is used to compile the HDL, synthesize the FPGA design, perform place-and-route, generate the bitstream, and program the Tang Nano 20K.
+See `docs/PHASE2_BASE_CPC.md` and `docs/FULL_CORE_ROADMAP.md`.
 
-The main real-cartridge diagnostic project is:
+## HDMI audio + TMDS
 
-`GX4000_RealCart_RevA.gprj`
+The standalone HDMI build implements CEA VIC 17 (720x576p50), 27 MHz pixel timing, 135 MHz OSER10 serialization, TMDS/TERC4, BCH/ECC, AVI/SPD/Audio InfoFrames and 48 kHz 16-bit stereo LPCM. See `docs/HDMI_AUDIO_TMDS.md`.
 
-The HDMI audio/TMDS bring-up project is:
+## Hardware safety
 
-`GX4000_HDMI_Bringup.gprj`
+The cartridge bus is 5 V and must use the level-shifted adapter. Never connect the real cartridge bus directly to Tang Nano FPGA I/O. Keep translator outputs disabled until FPGA clocks and reset are stable.
 
-## Important: do NOT wire a cartridge directly to the Tang Nano 20K
+## Validation status
 
-The original cartridge bus is a **5 V interface**. The FPGA side is 3.3 V. Use proper level translation for address/control, D0-D7 and `SIN`, and keep translator enables disabled until configuration is complete.
-
-## Cartridge connector
-
-The original system uses a female 2x18 cartridge-edge connector. See `docs/CARTRIDGE_BUS.md`.
-
-## HDMI audio + TMDS bring-up
-
-The standalone HDMI build targets the Tang Nano 20K onboard HDMI connector and implements:
-
-- CEA VIC 17 / 720x576p50
-- 27 MHz pixel clock
-- 135 MHz OSER10 serializer clock
-- 270 Mbit/s per TMDS lane
-- full TMDS video/control encoding
-- TERC4 HDMI data islands
-- BCH/ECC packet assembly
-- 48 kHz, 16-bit stereo LPCM
-- Audio Sample Packets
-- Audio Clock Regeneration using N=6144 and CTS=27000
-- Audio, AVI and SPD InfoFrames
-- TLVDS differential outputs on the onboard HDMI pairs
-- colour-bar test image and 1 kHz stereo test tone
-
-Open `GX4000_HDMI_Bringup.gprj` and use `gx4000_hdmi_bringup_top` as the top module.
-
-The HDMI packet/TMDS code is self-contained under `third_party/hdl-util-hdmi/hdmi_bundle.sv`, derived from the MIT-licensed `hdl-util/hdmi` project and documented in `third_party/hdl-util-hdmi/LICENSE-MIT`.
-
-See `README_HDMI_AUDIO.md` and `docs/HDMI_AUDIO_TMDS.md`.
-
-## Status
-
-The cartridge diagnostic path and HDMI bring-up path are separate builds. The HDMI source has been statically checked, but **GOWIN synthesis/place-and-route and physical Tang Nano 20K testing have not yet been run in this environment**.
-
-The full playable GX4000 CPU/ASIC/video/audio core remains unfinished; the reusable HDMI transport is ready to accept future GX4000 RGB and stereo PCM sources.
+Phase 2 RTL has passed structural/reference checks for CPC pixel packing, screen addressing and clock/timing constants. GOWIN EDA is not installed in the current execution environment, so synthesis/place-and-route and physical cartridge/logic-analyser validation are still required. Phase 3 (the GX4000 ASIC enhancements) remains next.
