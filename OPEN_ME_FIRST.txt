@@ -1,0 +1,16 @@
+GX4000 Tang Nano 20K project
+
+For real-cartridge diagnostic bring-up:
+  GX4000_RealCart_RevA.gprj
+
+For HDMI video + 48 kHz stereo audio bring-up:
+  GX4000_HDMI_Bringup.gprj
+
+HDMI bring-up expected output:
+  720x576p50 colour bars
+  1 kHz stereo test tone
+
+Read:
+  README.md
+  README_HDMI_AUDIO.md
+  docs/HDMI_AUDIO_TMDS.md

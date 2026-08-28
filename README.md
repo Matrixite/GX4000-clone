@@ -21,193 +21,50 @@ Rev A deliberately starts with the cartridge interface because the physical cart
 
 For the **Tang Nano 20K** build, use **GOWIN EDA**.
 
-GOWIN EDA is used to:
+GOWIN EDA is used to compile the HDL, synthesize the FPGA design, perform place-and-route, generate the bitstream, and program the Tang Nano 20K.
 
-- compile the Verilog/SystemVerilog source,
-- synthesize the FPGA design,
-- perform place-and-route,
-- generate the FPGA bitstream,
-- and program the Tang Nano 20K.
+The main real-cartridge diagnostic project is:
 
-The **GOWIN Programmer** utility is used to write the generated bitstream to the board. The Tang Nano 20K includes onboard programming hardware, so a separate external JTAG programmer is normally not required.
+`GX4000_RealCart_RevA.gprj`
 
-Official GOWIN EDA download page:
+The HDMI audio/TMDS bring-up project is:
 
-https://www.gowinsemi.com/en/support/download_eda/
-
-### Ready-to-open GOWIN project
-
-This repository now includes:
-
-```text
-GX4000_RealCart_RevA.gprj
-```
-
-Open that file directly in GOWIN EDA. It already targets the Tang Nano 20K FPGA and includes the Rev A diagnostic HDL sources.
-
-The real-cartridge pin constraints are intentionally **not** filled in yet. Those must match the exact pins used by the external 5 V level-shifter/cartridge adapter.
-
-### Device selection
-
-The GOWIN project targets:
-
-```text
-GW2AR-LV18QN88C8/I7
-```
-
-Device family/model:
-
-```text
-GW2AR-18C
-```
-
-### Rev A diagnostic top module
-
-For the first real-cartridge hardware test, use:
-
-```text
-gx4000_realcart_diag_top
-```
-
-The project includes these source files:
-
-```text
-rtl/top/gx4000_realcart_diag_top.sv
-rtl/cart/cart_read_cycle.sv
-rtl/cart/acid_link_monitor.sv
-rtl/diag/cart_diag_engine.sv
-rtl/common/uart_tx.sv
-```
-
-The cartridge mapper is also available at:
-
-```text
-rtl/cart/gx4000_cart_mapper.sv
-```
-
-### Pin constraints
-
-A completed GOWIN `.cst` pin-constraint file is required before programming hardware.
-
-Start with:
-
-```text
-constraints/tangnano20k.cst.template
-```
-
-Fill in the FPGA pin numbers only after confirming which Tang Nano 20K header pins are connected to the cartridge adapter.
-
-Do **not** guess cartridge-interface FPGA pin numbers.
-
-### Basic programming workflow
-
-1. Install GOWIN EDA and GOWIN Programmer.
-2. Open `GX4000_RealCart_RevA.gprj`.
-3. Confirm the target is `GW2AR-LV18QN88C8/I7`.
-4. Add a completed `.cst` constraints file for the cartridge adapter wiring.
-5. Set `gx4000_realcart_diag_top` as the top module if GOWIN does not select it automatically.
-6. Run synthesis.
-7. Run place-and-route.
-8. Generate the bitstream.
-9. Connect the Tang Nano 20K by USB.
-10. Open GOWIN Programmer and program the generated bitstream.
-
-See `build/README_GOWIN.md` for additional build notes.
+`GX4000_HDMI_Bringup.gprj`
 
 ## Important: do NOT wire a cartridge directly to the Tang Nano 20K
 
-The original cartridge bus is a **5 V interface**. The FPGA side is 3.3 V.
-
-Use level translation:
-
-- FPGA -> cartridge address/control: 3.3 V to 5 V translation.
-- Cartridge D0-D7 -> FPGA: 5 V to 3.3 V translation.
-- Cartridge `SIN` -> FPGA: 5 V to 3.3 V translation.
-
-A practical adapter can use:
-
-- 3x SN74LVC8T245 for A0-A13, CA14-CA18, `/CE`, `CLK4`, `CCLR`.
-- 1x SN74LVC8T245 for D0-D7 in the cartridge-to-FPGA direction.
-- 1x single-bit dual-supply translator for `SIN` (or one spare channel on another suitable translator).
-
-The translator enables should default to the **safe / disabled** state until FPGA configuration is complete.
+The original cartridge bus is a **5 V interface**. The FPGA side is 3.3 V. Use proper level translation for address/control, D0-D7 and `SIN`, and keep translator enables disabled until configuration is complete.
 
 ## Cartridge connector
 
-The original system uses a female 2x18 cartridge-edge connector.
+The original system uses a female 2x18 cartridge-edge connector. See `docs/CARTRIDGE_BUS.md`.
 
-Logical signals used by this project:
+## HDMI audio + TMDS bring-up
 
-- A0-A13
-- CA14-CA18
-- D0-D7
-- /CE
-- CLK4
-- CCLR
-- SIN
-- +5V
-- GND
+The standalone HDMI build targets the Tang Nano 20K onboard HDMI connector and implements:
 
-See `docs/CARTRIDGE_BUS.md`.
+- CEA VIC 17 / 720x576p50
+- 27 MHz pixel clock
+- 135 MHz OSER10 serializer clock
+- 270 Mbit/s per TMDS lane
+- full TMDS video/control encoding
+- TERC4 HDMI data islands
+- BCH/ECC packet assembly
+- 48 kHz, 16-bit stereo LPCM
+- Audio Sample Packets
+- Audio Clock Regeneration using N=6144 and CTS=27000
+- Audio, AVI and SPD InfoFrames
+- TLVDS differential outputs on the onboard HDMI pairs
+- colour-bar test image and 1 kHz stereo test tone
 
-## ACID behaviour
+Open `GX4000_HDMI_Bringup.gprj` and use `gx4000_hdmi_bringup_top` as the top module.
 
-A genuine cartridge contains the ACID identification chip. On original hardware the ASIC checks the cartridge's serial `SIN` stream and intentionally disrupts RAM accesses when authentication fails.
+The HDMI packet/TMDS code is self-contained under `third_party/hdl-util-hdmi/hdmi_bundle.sv`, derived from the MIT-licensed `hdl-util/hdmi` project and documented in `third_party/hdl-util-hdmi/LICENSE-MIT`.
 
-This clone does **not need to reproduce that anti-copy penalty to read a genuine cartridge**. Rev A still clocks and resets the cartridge ACID and samples `SIN` so the link can be examined and a cycle-accurate ASIC-side checker can be added later.
-
-## Cartridge banking
-
-The cartridge can contain up to 32 x 16 KiB pages (512 KiB).
-
-The mapper module implements:
-
-- low cartridge page: RMR2 bits 2:0 -> physical pages 0..7
-- high cartridge page:
-  - logical ROM 0 or 7 -> physical page 3
-  - logical ROM 1..127 -> physical page 1
-  - logical ROM 128..255 -> physical pages 0..31 using bits 4:0
-
-See `rtl/cart/gx4000_cart_mapper.sv`.
-
-## First hardware test
-
-1. Build the level-shifted cartridge adapter.
-2. Leave the cartridge disconnected and verify:
-   - no FPGA pin is exposed to 5 V,
-   - `/CE` is high while FPGA is unconfigured,
-   - output translators are disabled while FPGA is unconfigured.
-3. Fit the Tang Nano 20K and program the diagnostic core.
-4. Verify address/control voltages before inserting a cartridge.
-5. Power down.
-6. Insert a cartridge.
-7. Power up.
-8. Capture the UART output at 115200 8N1.
-9. The diagnostic core reads the first 256 bytes of cartridge page 0 and prints them as hexadecimal.
-
-## Full GX4000 core architecture
-
-The playable core will connect these blocks:
-
-- Z80-compatible CPU, 4 MHz
-- 64 KiB RAM
-- CPC Gate Array-compatible video/memory timing
-- integrated 6845-style CRTC behaviour
-- CPC Plus/GX4000 ASIC register page
-- 12-bit (4096-colour) palette
-- 16 hardware sprites
-- raster interrupts
-- split-screen / soft scrolling
-- ASIC DMA audio
-- AY-3-8912-compatible PSG
-- PPI / joystick interface
-- cartridge mapper from this Rev A project
-- HDMI video/audio wrapper for Tang Nano 20K
-
-`rtl/top/gx4000_core_shell.sv` defines the integration boundary but intentionally does not pretend the CPU/ASIC implementation is finished.
+See `README_HDMI_AUDIO.md` and `docs/HDMI_AUDIO_TMDS.md`.
 
 ## Status
 
-**Rev A is a real-cartridge electrical/logic bring-up project, not yet a complete playable GX4000 core.**
+The cartridge diagnostic path and HDMI bring-up path are separate builds. The HDMI source has been statically checked, but **GOWIN synthesis/place-and-route and physical Tang Nano 20K testing have not yet been run in this environment**.
 
-That distinction is intentional: a wrong 5 V cartridge interface can damage the FPGA, so the physical bus is separated and testable before the complete console logic is added.
+The full playable GX4000 CPU/ASIC/video/audio core remains unfinished; the reusable HDMI transport is ready to accept future GX4000 RGB and stereo PCM sources.
