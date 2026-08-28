@@ -17,6 +17,91 @@ Rev A deliberately starts with the cartridge interface because the physical cart
 - Includes an ASIC/core integration shell for the later playable core.
 - Includes a testbench for cartridge bank translation.
 
+## Software needed to program the FPGA
+
+For the **Tang Nano 20K** build, use **GOWIN EDA**.
+
+GOWIN EDA is used to:
+
+- compile the Verilog/SystemVerilog source,
+- synthesize the FPGA design,
+- perform place-and-route,
+- generate the FPGA bitstream,
+- and program the Tang Nano 20K.
+
+The **GOWIN Programmer** utility is used to write the generated bitstream to the board. The Tang Nano 20K includes onboard programming hardware, so a separate external JTAG programmer is normally not required.
+
+Official GOWIN EDA download page:
+
+https://www.gowinsemi.com/en/support/download_eda/
+
+### Device selection
+
+When creating the project in GOWIN EDA, select the device fitted to the Tang Nano 20K:
+
+```text
+GW2AR-LV18QN88C8/I7
+```
+
+Device family/model:
+
+```text
+GW2AR-18C
+```
+
+### Rev A diagnostic top module
+
+For the first real-cartridge hardware test, set the project top-level module to:
+
+```text
+gx4000_realcart_diag_top
+```
+
+Add these source files to the GOWIN project:
+
+```text
+rtl/top/gx4000_realcart_diag_top.sv
+rtl/cart/cart_read_cycle.sv
+rtl/cart/acid_link_monitor.sv
+rtl/diag/cart_diag_engine.sv
+rtl/common/uart_tx.sv
+```
+
+The cartridge mapper is also available at:
+
+```text
+rtl/cart/gx4000_cart_mapper.sv
+```
+
+### Pin constraints
+
+A completed GOWIN `.cst` pin-constraint file is required before programming hardware.
+
+Start with:
+
+```text
+constraints/tangnano20k.cst.template
+```
+
+Fill in the FPGA pin numbers only after confirming which Tang Nano 20K header pins are connected to the cartridge adapter.
+
+Do **not** guess cartridge-interface FPGA pin numbers.
+
+### Basic programming workflow
+
+1. Install GOWIN EDA and GOWIN Programmer.
+2. Create a project for `GW2AR-LV18QN88C8/I7`.
+3. Add the Rev A SystemVerilog files listed above.
+4. Set `gx4000_realcart_diag_top` as the top module.
+5. Add a completed `.cst` constraints file.
+6. Run synthesis.
+7. Run place-and-route.
+8. Generate the bitstream.
+9. Connect the Tang Nano 20K by USB.
+10. Open GOWIN Programmer and program the generated bitstream.
+
+See `build/README_GOWIN.md` for additional build notes.
+
 ## Important: do NOT wire a cartridge directly to the Tang Nano 20K
 
 The original cartridge bus is a **5 V interface**. The FPGA side is 3.3 V.
