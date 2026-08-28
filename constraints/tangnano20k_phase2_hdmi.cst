@@ -1,0 +1,36 @@
+// GX4000 Phase 2 + onboard HDMI - Tang Nano 20K
+IO_LOC  "clk27" 4;
+IO_PORT "clk27" IO_TYPE=LVCMOS33 PULL_MODE=NONE;
+
+// Real-cartridge adapter
+IO_LOC "cart_a[0]" 73; IO_LOC "cart_a[1]" 74; IO_LOC "cart_a[2]" 75;
+IO_LOC "cart_a[3]" 85; IO_LOC "cart_a[4]" 77; IO_LOC "cart_a[5]" 15;
+IO_LOC "cart_a[6]" 16; IO_LOC "cart_a[7]" 27; IO_LOC "cart_a[8]" 28;
+IO_LOC "cart_a[9]" 25; IO_LOC "cart_a[10]" 26; IO_LOC "cart_a[11]" 29;
+IO_LOC "cart_a[12]" 30; IO_LOC "cart_a[13]" 31;
+IO_PORT "cart_a[*]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "cart_ca[0]" 17; IO_LOC "cart_ca[1]" 18; IO_LOC "cart_ca[2]" 19;
+IO_LOC "cart_ca[3]" 80; IO_LOC "cart_ca[4]" 42;
+IO_PORT "cart_ca[*]" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+
+IO_LOC "cart_ce_n" 41;  IO_PORT "cart_ce_n" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+IO_LOC "cart_clk4" 56;  IO_PORT "cart_clk4" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "cart_cclr" 54;  IO_PORT "cart_cclr" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8;
+IO_LOC "xlat_oe_n" 20; IO_PORT "xlat_oe_n" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8;
+
+IO_LOC "cart_d[0]" 51; IO_LOC "cart_d[1]" 48; IO_LOC "cart_d[2]" 55;
+IO_LOC "cart_d[3]" 49; IO_LOC "cart_d[4]" 79; IO_LOC "cart_d[5]" 72;
+IO_LOC "cart_d[6]" 71; IO_LOC "cart_d[7]" 53;
+IO_PORT "cart_d[*]" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+IO_LOC "cart_sin" 52; IO_PORT "cart_sin" IO_TYPE=LVCMOS33 PULL_MODE=DOWN;
+
+// Tang Nano 20K onboard HDMI differential pairs
+IO_LOC "O_tmds_clk_p" 33,34;
+IO_PORT "O_tmds_clk_p" IO_TYPE=LVDS25 PULL_MODE=NONE DRIVE=3.5 BANK_VCCIO=3.3;
+IO_LOC "O_tmds_data_p[0]" 35,36;
+IO_PORT "O_tmds_data_p[0]" IO_TYPE=LVDS25 PULL_MODE=NONE DRIVE=3.5 BANK_VCCIO=3.3;
+IO_LOC "O_tmds_data_p[1]" 37,38;
+IO_PORT "O_tmds_data_p[1]" IO_TYPE=LVDS25 PULL_MODE=NONE DRIVE=3.5 BANK_VCCIO=3.3;
+IO_LOC "O_tmds_data_p[2]" 39,40;
+IO_PORT "O_tmds_data_p[2]" IO_TYPE=LVDS25 PULL_MODE=NONE DRIVE=3.5 BANK_VCCIO=3.3;
