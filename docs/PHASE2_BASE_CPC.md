@@ -82,5 +82,3 @@ The source tree has static structural checks and focused Python reference tests 
 - 27-colour hardware palette values
 - standard CRTC timing constants
 - 16/4/1 MHz clock relationships
-
-GOWIN EDA is not installed in the current execution environment, so synthesis, place-and-route and physical real-cartridge testing are still required before this milestone can be called hardware-verified.
