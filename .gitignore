@@ -1,0 +1,13 @@
+# Gowin generated files
+impl/
+*.fs
+*.bin
+*.log
+*.tmp
+*.bak
+*.gprj.user
+
+# Editors
+.vscode/
+.idea/
+*~
