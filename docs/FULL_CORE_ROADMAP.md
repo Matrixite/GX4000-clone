@@ -44,13 +44,17 @@
 - optional third-fire matrix bits
 - Plus ADC0-ADC7 register reads at 6808-680F
 - four 6-bit external analogue channels for two sticks / four paddles
-- physical controller-harness FPGA pin assignment remains a board-integration task
+- two-wire MCP23017 controller adapter on FPGA pins 76/86
 
-## Phase 5 — presentation / system integration
-- refine scaler behaviour for non-standard CRTC timings
-- reset and cartridge-presence handling
-- optional UART debugger/trace
-- reviewed physical controller-harness pin constraints
+## Phase 5 — presentation / system integration — implemented in RTL
+- adaptive HDMI scan conversion measures source frame length instead of assuming 312 lines
+- widened source-line timing counter for stretched CRTC line periods
+- FIFO line/epoch validation and clean lock reacquisition after repeated misses
+- guarded cartridge startup with translator precharge and safe bus handover
+- timing trace with min/max frame and line measurements
+- on-screen binary debug overlay toggled by Player 1 Fire 2 + Fire 3
+- controller-harness pin constraints integrated into the main build
+- main project: `GX4000_Phase5_HDMI.gprj`
 
 ## Phase 6 — compatibility validation
 Test real cartridges with logic-analyser captures and tune edge cases.
