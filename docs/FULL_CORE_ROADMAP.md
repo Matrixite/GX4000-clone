@@ -1,35 +1,64 @@
 # Full playable GX4000 roadmap
 
 ## Phase 1 — real cartridge electrical bring-up — implemented
-- 5 V-safe adapter design
-- address/page drive, ROM read, ACID observation, UART dump
+- 5 V-safe cartridge adapter design
+- address/page drive
+- ROM read path
+- ACID link observation path
+- UART cartridge dump
 
 ## Phase 2 — CPU + base CPC timing — implemented
-- 4 MHz TV80 Z80, 64 KiB RAM, CRTC/Gate Array, CPC modes 0/1/2
-- real-cartridge execution and integrated 720x576p50 HDMI/TMDS
+- TV80 Z80-compatible CPU at 4 MHz
+- 64 KiB RAM
+- CPU/video access timing
+- I/O decode
+- Gate Array compatible mode/palette registers
+- programmable CRTC timing
+- CPC modes 0/1/2
+- real-cartridge execution path
+- integrated 720x576p50 HDMI/TMDS output
 
 ## Phase 3 — GX4000 / CPC Plus ASIC — implemented in RTL
-- ASIC unlock/relock and RMR2 register page
-- 32-entry 12-bit palette
-- 16 hardware sprites with x1/x2/x4 zoom
+- ASIC unlock/relock state machine
+- RMR2 and memory-mapped register page at 4000-7FFF
+- 32-entry 12-bit RGB palette
+- 16 x 16 hardware sprites, 16 sprites
+- independent x1/x2/x4 sprite zoom
 - programmable raster interrupt
-- screen split / secondary address
+- screen split / secondary start address
 - horizontal and vertical soft scroll
-- Plus interrupt vector/source handling
-- three-channel sound-DMA engine, status and interrupts
-- DMA PAUSE/REPEAT/LOOP/INT/STOP and PSG LOAD
+- interrupt vector/source handling
+- three-channel sound-DMA list engine
+- DMA PAUSE/REPEAT/LOOP/INT/STOP and PSG LOAD commands
+- DMA status/interrupts
 
-## Phase 4 — audio and controllers — next
-- AY-3-8912 compatible PSG
-- Plus-compatible PPI behaviour
-- CPU + Phase-3 DMA PSG writes
-- stereo mixer to existing HDMI LPCM
-- joystick ports and optional analogue paddles
+## Phase 4 — audio and controllers — implemented in RTL
+- AY-3-8912-compatible PSG
+- CPC/GX4000 mode-0 PPI path
+- CPU PSG access through PPI Port A / Port C BDIR+BC1
+- Phase-3 DMA PSG writes connected to the same PSG registers
+- AY tone, noise, mixer, amplitude and envelope path
+- CPC+/GX4000 stereo mix: A left, B both, C right
+- stereo 16-bit audio into existing 48 kHz HDMI LPCM transport
+- digital joystick matrix rows 9 and 6
+- optional third-fire matrix bits
+- Plus ADC0-ADC7 register reads at 6808-680F
+- four 6-bit external analogue channels for two sticks / four paddles
+- physical controller-harness FPGA pin assignment remains a board-integration task
 
-## Phase 5 — presentation/system integration
-- refine scaler for non-standard CRTC timings
-- reset/cartridge-presence handling
-- optional UART trace
+## Phase 5 — presentation / system integration
+- refine scaler behaviour for non-standard CRTC timings
+- reset and cartridge-presence handling
+- optional UART debugger/trace
+- reviewed physical controller-harness pin constraints
 
 ## Phase 6 — compatibility validation
-Real-cartridge and logic-analyser tuning. Priority examples: Burnin' Rubber, Batman the Movie, Pang, Switchblade, Navy Seals, Robocop 2.
+Test real cartridges with logic-analyser captures and tune edge cases.
+
+Priority examples:
+- Burnin' Rubber
+- Batman the Movie
+- Pang
+- Switchblade
+- Navy Seals
+- Robocop 2

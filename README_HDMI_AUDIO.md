@@ -1,45 +1,9 @@
 # GX4000 HDMI audio + TMDS bring-up
 
-This package adds a standalone Tang Nano 20K HDMI transmitter bring-up build for the GX4000 FPGA project.
+The standalone HDMI project remains available as `GX4000_HDMI_Bringup.gprj`, with top module `gx4000_hdmi_bringup_top`.
 
-## Open this GOWIN project
+It provides 720x576p50 colour bars, true HDMI data islands, 48 kHz 16-bit stereo LPCM, and a 1 kHz stereo test tone. Transport blocks include 27 MHz pixel / 135 MHz OSER10 clocking, TMDS video/control encoding, TERC4 data islands, BCH/ECC, N=6144 / CTS=27000 audio clock regeneration, Audio/AVI/SPD InfoFrames, OSER10 serializers and TLVDS outputs.
 
-`GX4000_HDMI_Bringup.gprj`
+The HDMI transport accepts 4-bit RGB and signed 16-bit stereo PCM. The Phase 4 build now feeds the integrated GX4000 video and AY stereo audio paths into this transmitter.
 
-Top module:
-
-`gx4000_hdmi_bringup_top`
-
-## Expected hardware result
-
-After synthesis, place-and-route and programming, connect the Tang Nano 20K onboard HDMI socket to an HDMI display.
-
-The test build is intended to output:
-
-- 720x576p50 colour bars
-- true HDMI data islands (not DVI-only)
-- 48 kHz, 16-bit stereo LPCM
-- a 1 kHz stereo test tone
-
-## Implemented transport blocks
-
-- 27 MHz pixel / 135 MHz OSER10 clock generation
-- TMDS video/control encoding
-- TERC4 data-island encoding
-- HDMI guard bands and preambles
-- BCH/ECC packet generation
-- Audio Clock Regeneration, N=6144 / CTS=27000
-- IEC-60958 stereo LPCM Audio Sample Packets
-- Audio InfoFrame
-- AVI InfoFrame (VIC 17)
-- SPD InfoFrame (`MATRIX`, `GX4000 FPGA`, source type Game)
-- four OSER10 serializers (three data + one clock)
-- TLVDS differential output buffers
-
-See `docs/HDMI_AUDIO_TMDS.md` for integration details.
-
-## Status
-
-Static source checks and transport-math checks pass in this environment. GOWIN EDA is not installed here, so this package has **not yet been synthesised, place-and-routed, or tested on physical Tang Nano 20K hardware**.
-
-The HDMI transport accepts 4-bit RGB and signed 16-bit stereo PCM, but the full GX4000 CPU/ASIC/video/audio core is still a separate unfinished part of the project.
+See `docs/HDMI_AUDIO_TMDS.md` for transport details.

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW2AR-18C" pn="GW2AR-LV18QN88C8/I7">gw2ar18c-000</Device>
+    <FileList>
+        <File path="rtl/top/gx4000_phase4_hdmi_top.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/top/gx4000_phase4_top.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/video/cpc_hdmi_scanconverter.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase4/gx4000_ppi8255.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase4/gx4000_input_matrix.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase4/ay38912_core.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase4/gx4000_adc_regs.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/gx4000_asic_unlock.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/gx4000_gate_array_plus.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/gx4000_crtc6845_plus.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/cpc_ram64k_plus.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/gx4000_plus_video.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/gx4000_plus_asic.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase3/gx4000_dma_engine.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/gowin_pll_32m.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_clock_tree.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase2/cpc_cart_cpu_bridge.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/cart/gx4000_cart_mapper.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/hdmi/gx4000_hdmi_tx.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/hdmi/gowin_hdmi_phy.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/hdmi/gowin_hdmi_serializer.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/hdmi/gowin_pll_135.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/hdmi/audio_clock_48k.sv" type="file.verilog" enable="1"/>
+        <File path="third_party/hdl-util-hdmi/hdmi_bundle.sv" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80s.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_core.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_alu.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_mcode.v" type="file.verilog" enable="1"/>
+        <File path="third_party/Z80-FPGA/TV80-verilog/tv80_reg.v" type="file.verilog" enable="1"/>
+        <File path="constraints/tangnano20k_phase4_hdmi.cst" type="file.cst" enable="1"/>
+        <File path="constraints/tangnano20k_phase4_hdmi.sdc" type="file.sdc" enable="1"/>
+    </FileList>
+</Project>
