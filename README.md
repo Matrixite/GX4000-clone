@@ -10,15 +10,15 @@ I have been building it in stages rather than trying to make the whole machine w
 
 The current integrated build is:
 
-`GX4000_Phase4_HDMI.gprj`
+`GX4000_Phase5_HDMI.gprj`
 
 with top module:
 
-`gx4000_phase4_hdmi_top`
+`gx4000_phase5_hdmi_top`
 
 The current signal path is:
 
-`real GX4000 cartridge -> cartridge mapper -> 4 MHz Z80 -> 64 KiB RAM -> CRTC / Gate Array -> Plus ASIC -> AY / PPI / controller logic -> HDMI video + stereo audio`
+`real GX4000 cartridge -> guarded cartridge interface -> cartridge mapper -> 4 MHz Z80 -> 64 KiB RAM -> CRTC / Gate Array -> Plus ASIC -> AY / PPI / controller logic -> adaptive HDMI scan conversion -> HDMI video + stereo audio`
 
 Video is sent as 720×576p50 HDMI/TMDS and audio is carried as 48 kHz stereo LPCM.
 
@@ -78,9 +78,9 @@ The main project for this stage is:
 
 ## Phase 4 — sound and controllers
 
-**Status: implemented and current main build**
+**Status: implemented**
 
-Phase 4 fills in the sound and input side of the machine.
+Phase 4 filled in the sound and input side of the machine.
 
 The project now has an AY-3-8912-compatible PSG with three tone channels, noise, mixer, volume and envelope support using the CPC/GX4000 1 MHz PSG timing.
 
@@ -96,7 +96,7 @@ Those 16-bit stereo samples are passed into the existing HDMI audio transmitter 
 
 Phase 4 also adds the CPC-style joystick matrix and Plus analogue input registers at `6808h-680Fh`.
 
-The current project is:
+The Phase 4 project is:
 
 - `GX4000_Phase4_HDMI.gprj`
 
@@ -104,13 +104,23 @@ More detail is in `docs/PHASE4_AUDIO_CONTROLLERS.md`.
 
 ## Phase 5 — integration and compatibility refinement
 
-**Status: planned / next major stage**
+**Status: implemented and current main build**
 
-Phase 5 is about taking the parts that now exist and making the whole machine more tolerant of real software and real hardware behaviour.
+Phase 5 keeps the Phase 4 machine core and concentrates on the parts around it that are most likely to expose timing problems on real hardware.
 
-The main areas I want to improve here are unusual CRTC timings, edge cases in the HDMI scan conversion, reset and cartridge timing, Plus raster effects that do not fit the standard display assumptions, and general debugging visibility inside the core.
+The HDMI scan converter no longer assumes that every source frame is exactly 312 lines long. It measures the source frame length and source line period, then uses those measurements when choosing which CPC line should line up with the start of the 576p output frame. A normal 312-line frame still behaves exactly as before, while frames with changed CRTC vertical totals can now be followed instead of immediately breaking the fixed line-number assumption.
 
-This is also the point where it makes sense to add better traces and diagnostics so problems can be narrowed down without guessing whether the fault is in the CPU, cartridge bus, ASIC, video path or DMA system.
+The line FIFO is also more defensive. It checks the expected source line number and frame epoch before moving on. A short FIFO miss repeats the previous line, but repeated misses drop the lock and force the converter to reacquire cleanly instead of reading old or overwritten line memory.
+
+Phase 5 also adds a safer cartridge startup wrapper. The level-shifter side is held in known states at power-up, then the external bus is only switched over to the live core after the core has completed its own reset sequence and the generated cartridge clock is at a safe low level.
+
+There is now a small HDMI timing/debug overlay too. Press **Player 1 Fire 2 + Fire 3 together** to toggle it. The binary display shows scan lock, controller/bus state, current/min/max frame length, current/min/max source line timing and the scan-converter lock-error count. It is intentionally simple so it does not consume another font ROM or large block of memory.
+
+The current Phase 5 project is:
+
+- `GX4000_Phase5_HDMI.gprj`
+
+More detail is in `docs/PHASE5_INTEGRATION.md`.
 
 ## Phase 6 — hardware validation
 
@@ -194,7 +204,7 @@ See `docs/PHASE4_CONTROLLER_GPIO.md` for the controller adapter details.
 
 # FPGA pin usage
 
-For reference, these are the pins currently reserved by the Phase 4 build.
+For reference, these are the pins currently reserved by the Phase 5 build.
 
 ## Cartridge interface
 
@@ -250,6 +260,6 @@ The controller expansion bus is different: SDA and SCL are **3.3 V only**. Use 3
 
 # Testing status
 
-The repository contains focused reference checks for the CPC timing and video work from Phase 2, the Plus ASIC features from Phase 3, the PPI/AY/controller/ADC work from Phase 4, and the HDMI/TMDS/audio timing.
+The repository contains focused reference checks for the CPC timing and video work from Phase 2, the Plus ASIC features from Phase 3, the PPI/AY/controller/ADC work from Phase 4, and the adaptive timing/startup work from Phase 5.
 
-These tests are useful for catching logic and integration mistakes, but they are not a replacement for testing on the real Tang Nano 20K, real cartridge hardware and a monitor. That is the job of the later hardware-validation phase.
+These tests are useful for catching logic and integration mistakes, but they are not a replacement for GOWIN synthesis/place-and-route or testing on the real Tang Nano 20K, real cartridge hardware and a monitor. That is the job of Phase 6.
