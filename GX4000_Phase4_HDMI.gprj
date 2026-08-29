@@ -8,6 +8,7 @@
         <File path="rtl/top/gx4000_phase4_hdmi_top.sv" type="file.verilog" enable="1"/>
         <File path="rtl/top/gx4000_phase4_top.sv" type="file.verilog" enable="1"/>
         <File path="rtl/video/cpc_hdmi_scanconverter.sv" type="file.verilog" enable="1"/>
+        <File path="rtl/phase4/mcp23017_controller_reader.sv" type="file.verilog" enable="1"/>
         <File path="rtl/phase4/gx4000_ppi8255.sv" type="file.verilog" enable="1"/>
         <File path="rtl/phase4/gx4000_input_matrix.sv" type="file.verilog" enable="1"/>
         <File path="rtl/phase4/ay38912_core.sv" type="file.verilog" enable="1"/>
