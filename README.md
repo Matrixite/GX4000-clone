@@ -262,4 +262,12 @@ The controller expansion bus is different: SDA and SCL are **3.3 V only**. Use 3
 
 The repository contains focused reference checks for the CPC timing and video work from Phase 2, the Plus ASIC features from Phase 3, the PPI/AY/controller/ADC work from Phase 4, and the adaptive timing/startup work from Phase 5.
 
-These tests are useful for catching logic and integration mistakes, but they are not a replacement for GOWIN synthesis/place-and-route or testing on the real Tang Nano 20K, real cartridge hardware and a monitor. That is the job of Phase 6.
+## Burnin' Rubber Verilator test
+
+Burnin' Rubber has also been run through the actual GX4000 RTL with Verilator rather than through a GX4000 software emulator. The run used the project's TV80 Z80, cartridge mapper and bridge, RAM, CRTC, Gate Array, Plus ASIC, DMA, PPI and AY sound implementation.
+
+The cartridge successfully booted, switched cartridge pages, unlocked the Plus ASIC and programmed the CRTC. After correcting two timing issues found by the test in the simulation copy, the core rendered the title/setup text correctly, produced non-zero stereo AY audio, detected a simulated Fire 1 press and advanced to the controller/gears setup screen.
+
+The test was especially useful because it exposed two integration problems: repeated handling of Z80 I/O writes by the 16 MHz peripheral logic, and a one-clock error in the synchronous video-RAM fetch pipeline. The full results and exact findings are in [the Burnin' Rubber Phase 5 Verilator test report](docs/BURNIN_RUBBER_PHASE5_VERILATOR_TEST_REPORT.md).
+
+This is a strong software-level RTL test, but it does **not** replace GOWIN synthesis/place-and-route or testing on the real Tang Nano 20K, real cartridge hardware and a monitor. That is still the job of Phase 6.
