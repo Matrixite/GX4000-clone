@@ -1,0 +1,63 @@
+name: Phase 5 Verilator
+
+on:
+  push:
+    paths:
+      - '.github/workflows/verilator-phase5.yml'
+      - 'rtl/**'
+      - 'third_party/**'
+      - 'GX4000_Phase5_HDMI.gprj'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verilator-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout with TV80
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Verilator
+        run: sudo apt-get update && sudo apt-get install -y verilator
+
+      - name: Preserve exact TV80 dependency for simulation
+        uses: actions/upload-artifact@v4
+        with:
+          name: tv80-source
+          path: third_party/Z80-FPGA/TV80-verilog
+          retention-days: 1
+
+      - name: Create simulation-only PLL and parser compatibility copies
+        shell: bash
+        run: |
+          mkdir -p build/sim
+          cat > build/sim/gowin_pll_32m_sim.sv <<'EOF'
+          `timescale 1ns/1ps
+          module gowin_pll_32m(input logic clkin, output logic clkout, output logic lock);
+            initial begin clkout = 1'b0; lock = 1'b0; #1000 lock = 1'b1; end
+            always #15.625 clkout = ~clkout;
+            wire _unused = clkin;
+          endmodule
+          EOF
+          sed 's/\bwithin\b/within_slot/g' rtl/phase3/gx4000_plus_video.sv > build/sim/gx4000_plus_video_sim.sv
+
+      - name: Lint Phase 5 machine core
+        shell: bash
+        run: |
+          verilator --lint-only --timing -Wall -Wno-fatal --top-module gx4000_phase4_top \
+            build/sim/gowin_pll_32m_sim.sv \
+            third_party/Z80-FPGA/TV80-verilog/tv80s.v \
+            third_party/Z80-FPGA/TV80-verilog/tv80_core.v \
+            third_party/Z80-FPGA/TV80-verilog/tv80_alu.v \
+            third_party/Z80-FPGA/TV80-verilog/tv80_mcode.v \
+            third_party/Z80-FPGA/TV80-verilog/tv80_reg.v \
+            rtl/top/gx4000_phase4_top.sv \
+            rtl/phase2/cpc_clock_tree.sv rtl/phase2/cpc_cart_cpu_bridge.sv \
+            rtl/cart/gx4000_cart_mapper.sv \
+            rtl/phase3/gx4000_asic_unlock.sv rtl/phase3/gx4000_gate_array_plus.sv \
+            rtl/phase3/gx4000_crtc6845_plus.sv rtl/phase3/cpc_ram64k_plus.sv \
+            build/sim/gx4000_plus_video_sim.sv rtl/phase3/gx4000_plus_asic.sv rtl/phase3/gx4000_dma_engine.sv \
+            rtl/phase4/gx4000_adc_regs.sv rtl/phase4/gx4000_input_matrix.sv \
+            rtl/phase4/gx4000_ppi8255.sv rtl/phase4/ay38912_core.sv
