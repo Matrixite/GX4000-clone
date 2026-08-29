@@ -26,9 +26,83 @@ Current integrated path:
 
 See `docs/PHASE4_AUDIO_CONTROLLERS.md`.
 
-## Controller hardware note
+## Controller GPIO wiring
 
-The Phase-4 core exposes real logical digital and analogue controller inputs. The standard Tang Nano HDMI top currently ties them inactive because the cartridge-adapter pinout already consumes many GPIOs and a controller-harness pin assignment has not been specified. This avoids inventing pins that may conflict with existing hardware.
+The cartridge and onboard HDMI interfaces already consume most of the Tang Nano 20K GPIOs, so the two digital controller ports are carried over a two-wire I2C-style expansion bus instead of using one FPGA pin per button.
+
+### Tang Nano 20K pins
+
+- `ctrl_sda` = FPGA pin **76**
+- `ctrl_scl` = FPGA pin **86**
+
+Both lines are 3.3 V signals. Fit external **4.7 kOhm pull-ups to 3.3 V** on the controller adapter. Do not connect 5 V directly to either FPGA pin.
+
+### Controller I/O expander
+
+Use an MCP23017-compatible 16-bit I/O expander at I2C address `0x20`:
+
+- A0 = GND
+- A1 = GND
+- A2 = GND
+- VDD = 3.3 V
+- VSS = GND
+- SDA = `ctrl_sda` / FPGA pin 76
+- SCL = `ctrl_scl` / FPGA pin 86
+- RESET = 3.3 V
+
+The FPGA module `rtl/phase4/mcp23017_controller_reader.sv` polls GPIOA and GPIOB and feeds the existing Phase-4 joystick matrix.
+
+All controller inputs are active low. Each switch connects its MCP23017 GPIO input to ground when pressed.
+
+### Player 1 — GPIOA
+
+| MCP23017 pin | Function |
+| --- | --- |
+| GPA0 | Up |
+| GPA1 | Down |
+| GPA2 | Left |
+| GPA3 | Right |
+| GPA4 | Fire 1 |
+| GPA5 | Fire 2 |
+| GPA6 | Fire 3 |
+| GPA7 | Spare |
+
+### Player 2 — GPIOB
+
+| MCP23017 pin | Function |
+| --- | --- |
+| GPB0 | Up |
+| GPB1 | Down |
+| GPB2 | Left |
+| GPB3 | Right |
+| GPB4 | Fire 1 |
+| GPB5 | Fire 2 |
+| GPB6 | Fire 3 |
+| GPB7 | Spare |
+
+The Phase-4 ASIC ADC register logic remains implemented. The current standard wrapper still returns full-scale values for ADC0-ADC3; a separate external ADC can later share the same two-wire bus if analogue paddles are required.
+
+See `docs/PHASE4_CONTROLLER_GPIO.md` for the controller adapter details.
+
+## FPGA pins currently used
+
+The main Phase-4 build currently reserves:
+
+- clock: pin 4
+- cartridge A0-A13: pins 73, 74, 75, 85, 77, 15, 16, 27, 28, 25, 26, 29, 30, 31
+- cartridge CA14-CA18: pins 17, 18, 19, 80, 42
+- cartridge `/CE`: pin 41
+- cartridge `CLK4`: pin 56
+- cartridge `CCLR`: pin 54
+- cartridge level-shifter `XLAT_OE_N`: pin 20
+- cartridge D0-D7: pins 51, 48, 55, 49, 79, 72, 71, 53
+- cartridge `SIN`: pin 52
+- controller `SDA`: pin 76
+- controller `SCL`: pin 86
+- onboard HDMI TMDS clock: pins 33/34
+- onboard HDMI TMDS D0: pins 35/36
+- onboard HDMI TMDS D1: pins 37/38
+- onboard HDMI TMDS D2: pins 39/40
 
 ## Earlier bring-up projects
 
@@ -41,6 +115,8 @@ TV80 is pinned as the `third_party/Z80-FPGA` git submodule. Clone with `--recurs
 ## Hardware safety
 
 The real cartridge interface is 5 V. Use the level-shifted cartridge adapter and keep translator outputs disabled until FPGA configuration, clocks and reset are stable. Never connect the cartridge bus directly to Tang Nano 20K FPGA I/O.
+
+The controller expansion bus is **3.3 V only**. Use 3.3 V pull-ups on SDA/SCL and do not expose pins 76 or 86 to 5 V.
 
 ## Reference validation
 
