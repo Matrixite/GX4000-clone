@@ -1,0 +1,88 @@
+name: Publish Phase 5 Core Release
+
+on:
+  push:
+    paths:
+      - '.github/workflows/publish-phase5-release.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout complete core
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Build self-contained source package
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION="v0.5.0"
+          ROOT="GX4000-Phase5-${VERSION}"
+          mkdir -p "release-package/${ROOT}"
+          rsync -a \
+            --exclude='.git' \
+            --exclude='release-package' \
+            ./ "release-package/${ROOT}/"
+          cd release-package
+          zip -qr "${ROOT}-source.zip" "${ROOT}"
+          sha256sum "${ROOT}-source.zip" > SHA256SUMS.txt
+
+      - name: Publish GitHub pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<'EOF'
+          # GX4000 FPGA Core — Phase 5
+
+          This is the first packaged release of the GX4000 FPGA real-cartridge core for the Tang Nano 20K.
+
+          ## What is included
+
+          - Phase 5 integrated GX4000/CPC Plus RTL
+          - TV80 Z80-compatible CPU dependency included in the downloadable source package
+          - real-cartridge mapper and cartridge CPU bridge
+          - 64 KiB RAM and CPC-style CRTC/Gate Array video path
+          - Plus ASIC unlock/register page, 12-bit palette, sprites, raster/split/scroll support and DMA
+          - AY-3-8912-compatible audio, PPI, joystick matrix and controller GPIO support
+          - adaptive 720x576p50 HDMI scan conversion with stereo audio
+          - Phase 5 startup guard and timing/debug overlay
+          - Verilator CI support and the Burnin' Rubber Phase 5 test report
+
+          ## Burnin' Rubber RTL test
+
+          Burnin' Rubber has been run through the actual RTL with Verilator rather than through a GX4000 software emulator. The cartridge boots, changes cartridge pages, unlocks the Plus ASIC, programs the CRTC, produces video and stereo AY audio, accepts Fire 1 and advances to the controller/gears setup screen.
+
+          The test also exposed I/O-write strobe and synchronous video-RAM fetch timing issues. The detailed findings are documented in `docs/BURNIN_RUBBER_PHASE5_VERILATOR_TEST_REPORT.md`.
+
+          ## Hardware status
+
+          **This is a pre-release.** The RTL has software-level/reference and Verilator testing, but it has not yet completed Phase 6 validation on a real Tang Nano 20K with the physical cartridge adapter, real cartridges, HDMI display and controllers.
+
+          No GOWIN-generated FPGA bitstream is included in this release. Build `GX4000_Phase5_HDMI.gprj` with the appropriate GOWIN toolchain for the target hardware.
+
+          The downloadable `GX4000-Phase5-v0.5.0-source.zip` is self-contained and includes the TV80 submodule source.
+          EOF
+
+          if gh release view v0.5.0 >/dev/null 2>&1; then
+            gh release upload v0.5.0 \
+              release-package/GX4000-Phase5-v0.5.0-source.zip \
+              release-package/SHA256SUMS.txt \
+              --clobber
+          else
+            gh release create v0.5.0 \
+              --target "$GITHUB_SHA" \
+              --title "GX4000 FPGA Core Phase 5 — v0.5.0" \
+              --notes-file release-notes.md \
+              --prerelease \
+              release-package/GX4000-Phase5-v0.5.0-source.zip \
+              release-package/SHA256SUMS.txt
+          fi
