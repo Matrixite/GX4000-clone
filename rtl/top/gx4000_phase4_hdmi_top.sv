@@ -8,6 +8,12 @@ module gx4000_phase4_hdmi_top (
     output wire        cart_cclr,
     input  wire        cart_sin,
     output wire        xlat_oe_n,
+
+    // Two-wire controller expansion bus. The default external adapter uses an
+    // MCP23017 at I2C address 0x20 for both digital controller ports.
+    inout  wire        ctrl_sda,
+    inout  wire        ctrl_scl,
+
     output wire        O_tmds_clk_p,
     output wire        O_tmds_clk_n,
     output wire [2:0]  O_tmds_data_p,
@@ -17,15 +23,27 @@ module gx4000_phase4_hdmi_top (
     wire core_hsync, core_vsync, core_de, core_clk16;
     wire signed [15:0] core_audio_l, core_audio_r;
 
-    // Controller interface is fully implemented in the core. This standard board
-    // wrapper does not guess unallocated GPIO pins: no digital controller is
-    // pressed and no analogue stick is attached until a harness CST is supplied.
+    wire [6:0] joy0_n;
+    wire [6:0] joy1_n;
+    wire controller_valid;
+    wire controller_fault;
+
+    mcp23017_controller_reader controller_reader (
+        .clk16(core_clk16), .rst_n(~xlat_oe_n),
+        .ctrl_sda(ctrl_sda), .ctrl_scl(ctrl_scl),
+        .joy0_n(joy0_n), .joy1_n(joy1_n),
+        .controller_valid(controller_valid),
+        .controller_fault(controller_fault)
+    );
+
     gx4000_phase4_top u_core (
         .clk27(clk27),
         .cart_a(cart_a), .cart_ca(cart_ca), .cart_ce_n(cart_ce_n),
         .cart_d(cart_d), .cart_clk4(cart_clk4), .cart_cclr(cart_cclr),
         .cart_sin(cart_sin), .xlat_oe_n(xlat_oe_n),
-        .joy0_n(7'h7F), .joy1_n(7'h7F),
+        .joy0_n(joy0_n), .joy1_n(joy1_n),
+        // Analogue controller ADC hardware remains optional; these read as
+        // full-scale until a dedicated ADC interface is added to the adapter.
         .adc0(6'h3F), .adc1(6'h3F), .adc2(6'h3F), .adc3(6'h3F),
         .video_r(core_r), .video_g(core_g), .video_b(core_b),
         .video_hsync(core_hsync), .video_vsync(core_vsync), .video_de(core_de),
@@ -74,9 +92,6 @@ module gx4000_phase4_hdmi_top (
         .frame_locked(scan_locked)
     );
 
-    // Capture the 16 MHz PSG mixer output into the 48 kHz HDMI audio domain.
-    // Two stages reduce metastability risk; the PSG waveform changes far more
-    // slowly than the master clock and is stable for the audio sample aperture.
     logic signed [15:0] audio_l_meta, audio_l_48k;
     logic signed [15:0] audio_r_meta, audio_r_48k;
     always_ff @(posedge clk_audio or posedge hdmi_reset) begin
@@ -109,5 +124,5 @@ module gx4000_phase4_hdmi_top (
         .O_tmds_data_p(O_tmds_data_p), .O_tmds_data_n(O_tmds_data_n)
     );
 
-    wire _unused = &{1'b0, active, scan_locked};
+    wire _unused = &{1'b0, active, scan_locked, controller_valid, controller_fault};
 endmodule
